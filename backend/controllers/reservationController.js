@@ -39,7 +39,56 @@ const createReservation = (req, res) => {
         }
     );
 };
+const getUserReservations = (req, res) => {
+    const id_user = req.user.id_user;
+
+    reservationModel.getReservationsByUser(
+        id_user,
+        (err, results) => {
+            if (err) {
+                console.error(err);
+
+                return res.status(500).json({
+                    message: "Erreur lors de la récupération des réservations"
+                });
+            }
+
+            res.status(200).json(results);
+        }
+    );
+};
+const cancelReservation = (req, res) => {
+    const id_reservation = req.params.id;
+    const id_user = req.user.id_user;
+
+    reservationModel.deleteReservation(
+        id_reservation,
+        id_user,
+        (err, result) => {
+            if (err) {
+                console.error(err);
+
+                return res.status(500).json({
+                    message: "Erreur lors de l'annulation de la réservation"
+                });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({
+                    message: "Réservation introuvable"
+                });
+            }
+
+            res.status(200).json({
+                message: "Réservation annulée avec succès"
+            });
+        }
+    );
+};
+
 
 module.exports = {
-    createReservation
+    createReservation,
+    getUserReservations,
+    cancelReservation
 };
